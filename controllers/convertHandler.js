@@ -1,19 +1,29 @@
 function ConvertHandler() {
-  const regex = /^(\d+(\.\d+)?)?([a-zA-Z]+)$/;
+  const regex = /^((\d+(\.\d+)?)?(\/\d+(\.\d+)?)?)?([a-zA-Z]+)$/;
   const validUnits = ["gal", "l", "mi", "km", "lbs", "kg"];
 
   this.getNum = function (input) {
     const match = input.match(regex);
     if (!match) return null;
-    return match[1] ? parseFloat(match[1]) : 1;
+    const numStr = match[1];
+    console.log(numStr);
+    if (!numStr) return 1;
+    const [i, j] = numStr.split("/").map(parseFloat);
+    if (j) {
+      const result = i / j;
+      return parseFloat(result.toFixed(5));
+    } else {
+      return parseFloat(i.toFixed(5));
+    }
   };
 
   this.getUnit = function (input) {
     const match = input.match(regex);
     if (!match) return null;
-    return validUnits.includes(match[3].toLowerCase())
-      ? match[3].toLowerCase()
-      : null;
+    let u = match[6].toLowerCase();
+    if (!validUnits.includes(u)) return null;
+    if (u === "l") return "L";
+    return u;
   };
 
   this.getReturnUnit = function (initUnit) {
@@ -39,7 +49,7 @@ function ConvertHandler() {
     switch (unit) {
       case "gal":
         return "gallons";
-      case "l":
+      case "L":
         return "liters";
       case "mi":
         return "miles";
@@ -64,7 +74,7 @@ function ConvertHandler() {
           returnNum: parseFloat((initNum * galToL).toFixed(5)),
           returnUnit: this.getReturnUnit(initUnit),
         };
-      case "l":
+      case "L":
         return {
           returnNum: parseFloat((initNum / galToL).toFixed(5)),
           returnUnit: this.getReturnUnit(initUnit),
