@@ -1,12 +1,12 @@
 function ConvertHandler() {
-  const regex = /^((\d+(\.\d+)?)?(\/\d+(\.\d+)?)?)?([a-zA-Z]+)$/;
+  const numRegex = /^((\d+(\.\d+)?)?(\/\d+(\.\d+)?)?)?([a-zA-Z]+)$/;
+  const unitRegex = /([a-zA-Z]{1,3})$/;
   const validUnits = ["gal", "l", "mi", "km", "lbs", "kg"];
 
   this.getNum = function (input) {
-    const match = input.match(regex);
+    const match = input.match(numRegex);
     if (!match) return null;
     const numStr = match[1];
-    console.log(numStr);
     if (!numStr) return 1;
     const [i, j] = numStr.split("/").map(parseFloat);
     if (j) {
@@ -18,9 +18,9 @@ function ConvertHandler() {
   };
 
   this.getUnit = function (input) {
-    const match = input.match(regex);
+    const match = input.match(unitRegex);
     if (!match) return null;
-    let u = match[6].toLowerCase();
+    let u = match[1].toLowerCase();
     if (!validUnits.includes(u)) return null;
     if (u === "l") return "L";
     return u;
@@ -113,11 +113,12 @@ function ConvertHandler() {
   this.finalCut = function (input) {
     const initNum = this.getNum(input);
     const initUnit = this.getUnit(input);
-    if (!initNum || !initUnit) return null;
+    if (!initNum && !initUnit) return "invalid number and unit";
+    if (!initNum) return "invalid number";
+    if (!initUnit) return "invalid unit";
     const { returnNum, returnUnit } = this.convert(initNum, initUnit);
-    if (!returnNum || !returnUnit) return null;
     const string0 = this.getString(initNum, initUnit, returnNum, returnUnit);
-    if (!string0) return null;
+    if (!string0 || !returnNum || !returnUnit) return "A problem has occurred";
 
     return {
       initNum: initNum,

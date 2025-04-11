@@ -8,7 +8,6 @@ module.exports = function (app) {
   //Recover input from client
   app.get("/api/convert", (req, res) => {
     const output = convertHandler.finalCut(req.query.input);
-    if (!output) return res.json({ string: "invalid unit" });
     res.json(output);
   });
 };
